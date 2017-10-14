@@ -2,13 +2,23 @@
 extern crate error_chain;
 extern crate rayon;
 
+use rayon::prelude::*;
+
 error_chain! {
     foreign_links {
-
     }
 }
 
 fn run() -> Result<()> {
+    let paragraph = String::from(
+        "It was the best of times, it was the worst of times, \
+                      it was the age of wisdom, it was the age of foolishness...",
+    );
+    let sentences: Vec<&str> = paragraph.split(" ").collect();
+
+    let word_count: i32 = sentences.par_iter().map(|&x| 1).sum();
+    println!("Word count: {}", word_count);
+
     Ok(())
 }
 
