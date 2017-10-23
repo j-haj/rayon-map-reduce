@@ -6,29 +6,29 @@ use rayon::prelude::*;
 
 error_chain!{}
 
+struct Person {
+    age: i32,
+}
+
 fn run() -> Result<()> {
-    let paragraph = String::from(
-        "It was the best of times, it was the worst of times, \
-                      it was the age of wisdom, it was the age of foolishness...",
-    );
-    let sentences: Vec<&str> = paragraph.split(" ").collect();
 
-    let word_count: i32 = sentences.par_iter().map(|_x| 1).reduce(|| 0, |x, y| x + y);
-    println!("Word count: {}", word_count);
+    let v: Vec<Person> = vec![
+        Person { age: 23 },
+        Person { age: 19 },
+        Person { age: 42 },
+        Person { age: 17 },
+        Person { age: 17 },
+        Person { age: 31 },
+        Person { age: 30 },
+    ];
 
-    // filter - map - reduce example
-    let v: Vec<i32> = vec![1, 2, 7, 3, 9, 3, 8, 4, 9, 11, 1, 2, 12];
-    let expected = 1 + 4 + 9 + 9 + 16 + 1 + 4;
-    let square_sum_lt_5 = v.par_iter().filter(|&&x| x < 5).map(|&x| x * x).reduce(
-        || 0,
-        |x, y| x + y,
-    );
-    println!(
-        "Sum of squared values for elements less than 5 is {} (expected value: {})",
-        square_sum_lt_5,
-        expected
-    );
-
+    let gt_30 = |x: i32| x > 30;
+    let avg_age = v.par_iter()
+        .filter(|&ref x| gt_30(x.age))
+        .map(|ref x| x.age)
+        .reduce(|| 0, |x, y| x + y) as f64 /
+        v.par_iter().filter(|&ref x| gt_30(x.age)).count() as f64;
+    println!("The average age of people older than 30 is {}", avg_age);
     Ok(())
 }
 
